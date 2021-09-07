@@ -1,6 +1,6 @@
 from datetime import date
 from rest_framework import serializers
-from core.models import Survey, QuestionType, Question, Choice
+from core.models import Survey, Question, Choice
 from core.serializers import ChoiceSerializer
 from voting.models import Vote
 

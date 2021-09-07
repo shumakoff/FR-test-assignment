@@ -2,15 +2,18 @@ from datetime import date
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework import permissions
 from rest_framework.response import Response
-from core.models import Survey, QuestionType, Question, Choice
-from core.serializers import SurveySerializer, QuestionTypeSerializer, QuestionSerializer, ChoiceSerializer
+from rest_framework.decorators import action
+from core.models import Survey, Question, Choice
+from core.serializers import SurveySerializer, QuestionSerializer, ChoiceSerializer, NewQuestionSerializer
 
 
 class SurveyViewSet(viewsets.ViewSet):
     """
     API endpoint that allows Surveys to be managed
     """
+    #permission_classes = [permissions.IsAuthenticated]
 
 
     def list(self, request):
@@ -26,9 +29,10 @@ class SurveyViewSet(viewsets.ViewSet):
 
 
     def create(self, request):
-        serializer = SurveySerializer(data=request.data, many=True)
+        serializer = SurveySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response({'status': 'OK', 'survey_id': serializer.data['id']})
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
@@ -57,12 +61,25 @@ class SurveyViewSet(viewsets.ViewSet):
         return Response({'status': 'OK'})
 
 
-class QuestionTypeViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows QuestionTypes to be viewed.
-    """
-    queryset = QuestionType.objects.all()
-    serializer_class = QuestionTypeSerializer
+    @action(detail=True,
+            methods=['GET', 'POST'],
+            url_path='questions')
+    def questions(self, request, pk=None):
+        survey = get_object_or_404(Survey.objects.all(), id=pk)
+        if request.method == 'GET':
+            questions = Question.objects.filter(survey=survey)
+            serializer = QuestionSerializer(data=questions, many=True)
+            serializer.is_valid()
+            return Response(serializer.data)
+        elif request.method == 'POST':
+            serializer = NewQuestionSerializer(data=request.data, context={'survey_id':survey.id})
+            if serializer.is_valid():
+                serializer.save()
+                print(serializer.data)
+                return Response({'status': 'OK'})
+            else:
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
 
 
 class QuestionViewSet(viewsets.ModelViewSet):

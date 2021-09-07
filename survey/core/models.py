@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Survey(models.Model):
@@ -12,17 +13,19 @@ class Survey(models.Model):
         return f'{self.name}; {self.start_date} - {self.end_date}'
 
 
-class QuestionType(models.Model):
-    qtype = models.CharField(max_length=254)
-
-
-    def __str__(self):
-        return f'{self.qtype}'
-
-
 class Question(models.Model):
+    TEXT = "text"
+    SELECT = "select"
+    SELECT_MULTIPLE = "select-multiple"
+
+    QUESTION_TYPES = (
+        (TEXT, _("text (multiple line)")),
+        (SELECT, _("select")),
+        (SELECT_MULTIPLE, _("Select Multiple")),
+    )
+
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
-    qtype = models.ForeignKey(QuestionType, on_delete=models.CASCADE)
+    qtype = models.CharField(choices=QUESTION_TYPES, max_length=254)
     text = models.CharField(max_length=254)
 
     def __str__(self):

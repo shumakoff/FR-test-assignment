@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
-from core.models import Survey, QuestionType, Question, Choice
-from core.serializers import SurveySerializer, QuestionTypeSerializer, QuestionSerializer, ChoiceSerializer
+from core.models import Survey, Question, Choice
+from core.serializers import SurveySerializer, QuestionSerializer, ChoiceSerializer
 from voting.models import Vote
 from voting.serializers import VoteSerializer
 

@@ -16,18 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from core.views import SurveyViewSet, QuestionViewSet, ChoiceViewSet, QuestionTypeViewSet
+from rest_framework.authtoken.views import obtain_auth_token
+from core.views import SurveyViewSet, QuestionViewSet, ChoiceViewSet 
 from voting.views import VoteViewSet
 
 
 router = routers.DefaultRouter()
 router.register(r'surveys', SurveyViewSet, basename='surveyslist')
-router.register(r'questiontypes', QuestionTypeViewSet, basename='questiontypeslist')
 router.register(r'questions', QuestionViewSet, basename='questionslist')
 router.register(r'choices', ChoiceViewSet, basename='choiceslist')
 router.register(r'votes', VoteViewSet, basename='voteslist')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-token-auth/', obtain_auth_token),
     path('api/v1/', include(router.urls))
 ]
