@@ -62,24 +62,13 @@ class SurveyViewSet(viewsets.ViewSet):
 
 
     @action(detail=True,
-            methods=['GET', 'POST'],
             url_path='questions')
     def questions(self, request, pk=None):
         survey = get_object_or_404(Survey.objects.all(), id=pk)
-        if request.method == 'GET':
-            questions = Question.objects.filter(survey=survey)
-            serializer = QuestionSerializer(data=questions, many=True)
-            serializer.is_valid()
-            return Response(serializer.data)
-        elif request.method == 'POST':
-            serializer = NewQuestionSerializer(data=request.data, context={'survey_id':survey.id})
-            if serializer.is_valid():
-                serializer.save()
-                print(serializer.data)
-                return Response({'status': 'OK'})
-            else:
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
+        questions = Question.objects.filter(survey=survey)
+        serializer = QuestionSerializer(data=questions, many=True)
+        serializer.is_valid()
+        return Response(serializer.data)
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -90,9 +79,28 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
 
 
+    @action(detail=True,
+            url_path='choices')
+    def choices(self, request, pk=None):
+        question = get_object_or_404(Question.objects.all(), id=pk)
+        choices = Choice.objects.filter(question=question)
+        serializer = ChoiceSerializer(data=choices, many=True)
+        serializer.is_valid()
+        return Response(serializer.data)
+
+
 class ChoiceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Choices to be viewed.
     """
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
+
+
+    def create(self, request):
+        question_id = request.data['question']
+        if Question.objects.get(id=question_id).qtype == 'text':
+            return Response({'status':'Questions with type TEXT can\'t have choices'})
+        return super().create(request)
+
+

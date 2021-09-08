@@ -13,6 +13,17 @@ class SurveySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+    def validate(self, data):
+        """ Start of the survey must be
+        < than end of the survey
+        """
+        start_date = data['start_date']
+        end_date = data['end_date']
+        if end_date <= start_date:
+            raise serializers.ValidationError('end_date must be > than start_date')
+        return data
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     """
     Question serializer
@@ -28,7 +39,7 @@ class ChoiceSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Choice
-        fields = ['answer']
+        fields = '__all__'
 
 
 class NewQuestionSerializer(serializers.ModelSerializer):
