@@ -3,8 +3,9 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, authentication_classes, permission_classes
 from core.models import Survey, Question, Choice
 from core.serializers import SurveySerializer, QuestionSerializer, ChoiceSerializer, NewQuestionSerializer
 
@@ -72,8 +73,11 @@ class SurveyViewSet(viewsets.ViewSet):
 
 
     @action(detail=False,
+            permission_classes=[AllowAny],
             url_path='active')
     def active_surveys(self, request):
+        authentication_classes = [] #disables authentication
+        permission_classes = []
         today = date.today()
         queryset = Survey.objects.filter(end_date__gte=today)
         serializer = SurveySerializer(data=queryset, many=True)
