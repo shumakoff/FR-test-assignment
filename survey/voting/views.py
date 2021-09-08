@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
-from core.models import Survey, Question, Choice
+from core.models import Question, Choice
 from voting.models import Vote
 from voting.serializers import VoteSerializer, VotingSerializer, VotingTextSerializer, VotingSelectSerializer
 
@@ -31,9 +31,9 @@ class VoteViewSet(viewsets.ViewSet):
             user_id = serializer.data['user_id']
             question = get_object_or_404(Question.objects.all(), id=question_id)
             if question.survey.end_date < date.today():
-                    return Response({'status': 'The survey is closed'})
+                        return Response({'status': 'The survey is closed'})
             if question.survey.start_date > date.today():
-                    return Response({'status': 'The survey is not yet open'})
+                        return Response({'status': 'The survey is not yet open'})
 
             if question.qtype != 'text':
                 serializer = VotingSelectSerializer(data=request.data)
@@ -48,9 +48,8 @@ class VoteViewSet(viewsets.ViewSet):
                         choice = get_object_or_404(Choice.objects.filter(question=question), id=choice)
                         vote.choice.add(choice)
                     return Response({'status': 'OK'})
-                else:
-                    return Response(serializer.errors,
-                                    status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors,
+                                status.HTTP_400_BAD_REQUEST)
 
             else:
                 serializer = VotingTextSerializer(data=request.data)
@@ -62,10 +61,8 @@ class VoteViewSet(viewsets.ViewSet):
                     vote.text_answer = choices
                     vote.save()
                     return Response({'status': 'OK'})
-                else:
-                    return Response(serializer.errors,
-                                    status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors,
+                                status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors,
                             status.HTTP_400_BAD_REQUEST)
-

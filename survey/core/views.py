@@ -1,13 +1,13 @@
 from datetime import date
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework import permissions
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import action, authentication_classes, permission_classes
+from rest_framework.decorators import action
 from core.models import Survey, Question, Choice
-from core.serializers import SurveySerializer, QuestionSerializer, ChoiceSerializer, NewQuestionSerializer
+from core.serializers import SurveySerializer, QuestionSerializer, ChoiceSerializer
 
 
 class SurveyViewSet(viewsets.ViewSet):
@@ -34,9 +34,8 @@ class SurveyViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response({'status': 'OK', 'survey_id': serializer.data['id']})
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
     def update(self, request, pk):
@@ -48,9 +47,8 @@ class SurveyViewSet(viewsets.ViewSet):
             new_date = data['start_date']
             if survey.start_date != new_date:
                 return Response({'status': 'Changing start date is not allowed'})
-            else:
-                serializer.update(survey, data)
-                return Response({'status': 'OK'})
+            serializer.update(survey, data)
+            return Response({'status': 'OK'})
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
@@ -76,8 +74,6 @@ class SurveyViewSet(viewsets.ViewSet):
             permission_classes=[AllowAny],
             url_path='active')
     def active_surveys(self, request):
-        authentication_classes = [] #disables authentication
-        permission_classes = []
         today = date.today()
         queryset = Survey.objects.filter(end_date__gte=today)
         serializer = SurveySerializer(data=queryset, many=True)
@@ -118,5 +114,3 @@ class ChoiceViewSet(viewsets.ModelViewSet):
         if Question.objects.get(id=question_id).qtype == 'text':
             return Response({'status':'Questions with type TEXT can\'t have choices'})
         return super().create(request)
-
-

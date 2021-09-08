@@ -15,4 +15,3 @@ class Vote(models.Model):
         if self.question.qtype != 'text':
             return f'User {self.user} voted {self.question} with {choice}'
         return f'User {self.user} voted on {self.survey} in {self.question} with {self.text_answer}'
-

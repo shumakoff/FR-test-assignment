@@ -1,7 +1,6 @@
-from datetime import date
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from core.models import Survey, Question, Choice
+from core.models import Question, Choice
 from core.serializers import ChoiceSerializer, QuestionSerializer, SurveySerializer
 from voting.models import Vote
 
