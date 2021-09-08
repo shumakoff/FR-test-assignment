@@ -11,4 +11,8 @@ class Vote(models.Model):
 
 
     def __str__(self):
-        return f'{user} voted on {survey} in {question} with {choice}'
+        choice = self.choice.all()
+        if self.question.qtype != 'text':
+            return f'{self.user} voted on {self.survey} in {self.question} with {choice}'
+        return f'{self.user} voted on {self.survey} in {self.question} with {self.text_answer}'
+

@@ -71,6 +71,16 @@ class SurveyViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+    @action(detail=False,
+            url_path='active')
+    def active_surveys(self, request):
+        today = date.today()
+        queryset = Survey.objects.filter(end_date__gte=today)
+        serializer = SurveySerializer(data=queryset, many=True)
+        serializer.is_valid()
+        return Response(serializer.data)
+
+
 class QuestionViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Questions to be managed
