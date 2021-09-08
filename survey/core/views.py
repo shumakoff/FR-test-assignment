@@ -13,7 +13,7 @@ class SurveyViewSet(viewsets.ViewSet):
     """
     API endpoint that allows Surveys to be managed
     """
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
     def list(self, request):
@@ -87,6 +87,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
     @action(detail=True,
@@ -105,6 +106,7 @@ class ChoiceViewSet(viewsets.ModelViewSet):
     """
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
     def create(self, request):
