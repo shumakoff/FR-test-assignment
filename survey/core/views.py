@@ -61,12 +61,12 @@ class SurveyViewSet(viewsets.ViewSet):
 
 
     @action(detail=True,
+            permission_classes=[AllowAny],
             url_path='questions')
     def questions(self, request, pk=None):
         survey = get_object_or_404(Survey.objects.all(), id=pk)
         questions = Question.objects.filter(survey=survey)
-        serializer = QuestionSerializer(data=questions, many=True)
-        serializer.is_valid()
+        serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data)
 
 
@@ -76,8 +76,7 @@ class SurveyViewSet(viewsets.ViewSet):
     def active_surveys(self, request):
         today = date.today()
         queryset = Survey.objects.filter(end_date__gte=today)
-        serializer = SurveySerializer(data=queryset, many=True)
-        serializer.is_valid()
+        serializer = SurveySerializer(queryset, many=True)
         return Response(serializer.data)
 
 
@@ -91,12 +90,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 
     @action(detail=True,
+            permission_classes=[AllowAny],
             url_path='choices')
     def choices(self, request, pk=None):
         question = get_object_or_404(Question.objects.all(), id=pk)
         choices = Choice.objects.filter(question=question)
-        serializer = ChoiceSerializer(data=choices, many=True)
-        serializer.is_valid()
+        serializer = ChoiceSerializer(choices, many=True)
         return Response(serializer.data)
 
 
